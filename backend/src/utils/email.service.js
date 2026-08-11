@@ -1,27 +1,55 @@
-import nodemailer from 'nodemailer';
-
 /**
- * Configure Nodemailer Transporter (Supporting Brevo / Standard SMTP)
+ * Send Transactional Email using Brevo REST API v3
+ * Endpoint: POST https://api.brevo.com/v3/smtp/email
  */
-const getTransporter = () => {
-  const host = process.env.SMTP_HOST || 'smtp-relay.brevo.com';
-  const port = parseInt(process.env.SMTP_PORT || '587', 10);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+const sendBrevoEmail = async ({ to, subject, htmlContent }) => {
+  const apiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.EMAIL_FROM;
+  const senderName = process.env.EMAIL_SENDER_NAME;
 
-  if (user && pass) {
-    return nodemailer.createTransport({
-      host,
-      port,
-      secure: process.env.SMTP_SECURE === 'true', // false for port 587
-      auth: {
-        user,
-        pass,
-      },
-    });
+  if (!apiKey) {
+    console.warn('[Email Service Warning] BREVO_API_KEY is not configured. Email will not be sent.');
+    return false;
   }
 
-  return null;
+  const payload = {
+    sender: {
+      name: 'Sanjiv Keymaker',
+      email: senderEmail,
+    },
+    to: [
+      {
+        email: to,
+      },
+    ],
+    subject,
+    htmlContent,
+  };
+
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': apiKey,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[Email Service Error] Brevo REST API returned error:', response.status, errorData);
+      return false;
+    }
+
+    const data = await response.json();
+    console.log('[Email Service] Email sent successfully via Brevo REST API. Message ID:', data.messageId);
+    return true;
+  } catch (err) {
+    console.error('[Email Service Error] Failed to send email via Brevo REST API:', err.message);
+    return false;
+  }
 };
 
 /**
@@ -32,7 +60,6 @@ const getTransporter = () => {
  */
 export const sendOtpEmail = async (email, otp, purpose) => {
   const title = purpose === 'admin_registration' ? 'Admin Registration OTP' : 'Client Query Verification OTP';
-  const fromEmail = process.env.EMAIL_FROM || process.env.SMTP_USER || 'no-reply@keymaker.com';
 
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #dbeafe; border-radius: 12px; background-color: #ffffff;">
@@ -45,26 +72,11 @@ export const sendOtpEmail = async (email, otp, purpose) => {
     </div>
   `;
 
-  try {
-    const transporter = getTransporter();
-    if (transporter) {
-      await transporter.sendMail({
-        from: {
-          name: "Sanjiv Keymaker",
-          address: fromEmail,
-        },
-        sender: {
-          name: "Sanjiv Keymaker",
-          email: fromEmail,
-        },
-        to: email,
-        subject: `[KeyMaker] ${otp} is your ${title}`,
-        html: htmlContent,
-      });
-    }
-  } catch (err) {
-    console.error('[Email Service Error] Failed to send email via SMTP:', err.message);
-  }
+  await sendBrevoEmail({
+    to: email,
+    subject: `[KeyMaker] ${otp} is your ${title}`,
+    htmlContent,
+  });
 };
 
 /**
@@ -76,8 +88,6 @@ export const sendOtpEmail = async (email, otp, purpose) => {
  * @param {string} message
  */
 export const sendQueryTicketEmail = async (email, name, ticketId, subject, message) => {
-  const fromEmail = process.env.EMAIL_FROM || process.env.SMTP_USER || 'no-reply@keymaker.com';
-
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #dbeafe; border-radius: 12px; background-color: #ffffff;">
       <div style="background-color: #2563eb; padding: 16px 24px; border-radius: 8px 8px 0 0; color: #ffffff;">
@@ -103,24 +113,10 @@ export const sendQueryTicketEmail = async (email, name, ticketId, subject, messa
     </div>
   `;
 
-  try {
-    const transporter = getTransporter();
-    if (transporter) {
-      await transporter.sendMail({
-        from: {
-          name: "Sanjiv Keymaker",
-          address: fromEmail,
-        },
-        sender: {
-          name: "Sanjiv Keymaker",
-          email: fromEmail,
-        },
-        to: email,
-        subject: `[KeyMaker Ticket ${ticketId}] Confirmation of your query: ${subject}`,
-        html: htmlContent,
-      });
-    }
-  } catch (err) {
-    console.error('[Email Service Error] Failed to send ticket email via SMTP:', err.message);
-  }
+  await sendBrevoEmail({
+    to: email,
+    subject: `[KeyMaker Ticket ${ticketId}] Confirmation of your query: ${subject}`,
+    htmlContent,
+  });
 };
+
