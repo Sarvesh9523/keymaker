@@ -1,9 +1,9 @@
 import React from 'react';
 import PublicQueryPage from './PublicQueryPage';
 import { SITE_DATA } from '../config/siteData';
+import WhatsAppIcon from '../components/WhatsAppIcon';
 import {
   Phone,
-  MessageSquare,
   Star,
   Clock,
   UserCheck,
@@ -132,7 +132,7 @@ const HomePage = () => {
                 className="py-3 px-4 sm:py-3.5 sm:px-6 rounded-2xl bg-white hover:bg-slate-50 text-slate-900 border border-slate-300 font-bold text-xs sm:text-sm shadow-sm flex items-center gap-2.5 transition-all hover:scale-[1.02]"
               >
                 <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-emerald-500 flex items-center justify-center text-white">
-                  <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-white" />
+                  <WhatsAppIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white" />
                 </div>
                 <div className="text-left">
                   <div className="text-xs sm:text-xs font-black">WhatsApp Us</div>

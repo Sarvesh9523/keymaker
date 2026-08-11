@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { SITE_DATA } from '../config/siteData';
+import WhatsAppIcon from './WhatsAppIcon';
 import {
   Key,
   Phone,
-  MessageSquare,
   Menu,
   X,
   Home,
@@ -164,7 +164,7 @@ const Navbar = () => {
               className="bg-white hover:bg-slate-50 text-slate-900 py-2.5 px-4 rounded-2xl flex items-center gap-3 shadow-sm border border-slate-300 transition-all hover:scale-[1.02]"
             >
               <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-sm">
-                <MessageSquare className="w-4 h-4 fill-white" />
+                <WhatsAppIcon className="w-4 h-4 fill-white" />
               </div>
               <div className="text-left">
                 <div className="text-xs font-black text-slate-900">WhatsApp Us</div>
@@ -281,7 +281,7 @@ const Navbar = () => {
               rel="noopener noreferrer"
               className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm"
             >
-              <MessageSquare className="w-4 h-4 fill-white" />
+              <WhatsAppIcon className="w-4 h-4 fill-white" />
               <span>WhatsApp Us (Quick Response)</span>
             </a>
           </div>
