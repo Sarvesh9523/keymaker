@@ -126,103 +126,106 @@ const AdminDashboardPage = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Standalone Admin Top Navigation Bar */}
-      <header className="bg-white border-b border-blue-100 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-yellow-300 shadow-md shadow-blue-600/20">
-              <Key className="w-5 h-5 -rotate-45" />
+      <header className="bg-white border-b border-blue-100 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 shrink">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-blue-600 flex items-center justify-center text-yellow-300 shadow-md shadow-blue-600/20 shrink-0">
+              <Key className="w-4 h-4 sm:w-5 sm:h-5 -rotate-45" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl font-black text-blue-950 tracking-tight">KeyMaker</span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-blue-600 text-white">
-                  Admin Dashboard
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="text-base sm:text-xl font-black text-blue-950 tracking-tight">KeyMaker</span>
+                <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-extrabold uppercase bg-blue-600 text-white shrink-0">
+                  Admin
                 </span>
               </div>
-              <p className="text-[10px] font-semibold text-slate-400">Authenticated Session: {admin?.email}</p>
+              <p className="text-[9px] sm:text-[10px] font-semibold text-slate-400 truncate max-w-[140px] sm:max-w-none">
+                {admin?.email}
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <button
               onClick={fetchQueries}
               disabled={loading}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors"
+              title="Refresh Data"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Refresh Data</span>
+              <span className="hidden sm:inline">Refresh</span>
             </button>
 
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-yellow-100 text-yellow-900 hover:bg-yellow-200 border border-yellow-300 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold bg-yellow-400 hover:bg-yellow-300 text-blue-950 border border-yellow-500 transition-colors shadow-sm"
             >
-              <LogOut className="w-3.5 h-3.5 text-yellow-700" />
+              <LogOut className="w-3.5 h-3.5 text-blue-950" />
               <span>Log Out</span>
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-8">
         {/* Top Security Banner */}
-        <div className="bg-white p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border-l-4 border-l-blue-600 border border-blue-100 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 border border-blue-200">
-              <ShieldCheck className="w-5 h-5 text-blue-600" />
+        <div className="bg-white p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 border-l-4 border-l-blue-600 border border-blue-100 shadow-sm">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 border border-blue-200">
+              <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-blue-950">Active Admin Management Panel</h3>
-              <p className="text-xs text-slate-500 font-medium">
+              <h3 className="text-xs sm:text-sm font-bold text-blue-950">Active Admin Management Panel</h3>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-medium">
                 Review client inquiries, filter status, and update resolution progress.
               </p>
             </div>
           </div>
         </div>
 
-      {/* Metric Cards Header */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Metric Cards Header (3 Columns Grid on Mobile) */}
+      <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
         {/* Total Queries */}
-        <div className="bg-white p-5 rounded-2xl border border-blue-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-2.5 sm:p-5 rounded-xl sm:rounded-2xl border border-blue-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-2">
           <div>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Queries</p>
-            <h4 className="text-2xl font-extrabold text-blue-950 mt-1">{totalCount}</h4>
+            <p className="text-[9px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Total</p>
+            <h4 className="text-base sm:text-2xl font-extrabold text-blue-950 mt-0.5 sm:mt-1">{totalCount}</h4>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
-            <Inbox className="w-6 h-6" />
+          <div className="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0 self-end sm:self-auto">
+            <Inbox className="w-3.5 h-3.5 sm:w-6 sm:h-6" />
           </div>
         </div>
 
         {/* Pending */}
-        <div className="bg-white p-5 rounded-2xl border border-yellow-200 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-2.5 sm:p-5 rounded-xl sm:rounded-2xl border border-yellow-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-2">
           <div>
-            <p className="text-xs font-bold text-yellow-800 uppercase tracking-wider">Pending</p>
-            <h4 className="text-2xl font-extrabold text-yellow-950 mt-1">{pendingCount}</h4>
+            <p className="text-[9px] sm:text-xs font-bold text-yellow-800 uppercase tracking-wider">Pending</p>
+            <h4 className="text-base sm:text-2xl font-extrabold text-yellow-950 mt-0.5 sm:mt-1">{pendingCount}</h4>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-yellow-100 border border-yellow-300 flex items-center justify-center text-yellow-700">
-            <Clock className="w-6 h-6" />
+          <div className="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-yellow-100 border border-yellow-300 flex items-center justify-center text-yellow-700 shrink-0 self-end sm:self-auto">
+            <Clock className="w-3.5 h-3.5 sm:w-6 sm:h-6" />
           </div>
         </div>
 
         {/* In Progress */}
-        <div className="bg-white p-5 rounded-2xl border border-blue-200 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-2.5 sm:p-5 rounded-xl sm:rounded-2xl border border-blue-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-2">
           <div>
-            <p className="text-xs font-bold text-blue-700 uppercase tracking-wider">In-Progress</p>
-            <h4 className="text-2xl font-extrabold text-blue-950 mt-1">{inProgressCount}</h4>
+            <p className="text-[9px] sm:text-xs font-bold text-blue-700 uppercase tracking-wider">Progress</p>
+            <h4 className="text-base sm:text-2xl font-extrabold text-blue-950 mt-0.5 sm:mt-1">{inProgressCount}</h4>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600">
-            <RefreshCw className="w-6 h-6" />
+          <div className="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0 self-end sm:self-auto">
+            <RefreshCw className="w-3.5 h-3.5 sm:w-6 sm:h-6" />
           </div>
         </div>
 
         {/* Resolved */}
-        <div className="bg-white p-5 rounded-2xl border border-blue-200 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-2.5 sm:p-5 rounded-xl sm:rounded-2xl border border-blue-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-2 col-span-3 sm:col-span-3 lg:col-span-1">
           <div>
-            <p className="text-xs font-bold text-blue-900 uppercase tracking-wider">Resolved</p>
-            <h4 className="text-2xl font-extrabold text-blue-950 mt-1">{resolvedCount}</h4>
+            <p className="text-[9px] sm:text-xs font-bold text-blue-900 uppercase tracking-wider">Resolved</p>
+            <h4 className="text-base sm:text-2xl font-extrabold text-blue-950 mt-0.5 sm:mt-1">{resolvedCount}</h4>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 text-yellow-300 flex items-center justify-center shadow-md">
-            <CheckCircle className="w-6 h-6" />
+          <div className="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-blue-600 text-yellow-300 flex items-center justify-center shadow-md shrink-0 self-end sm:self-auto">
+            <CheckCircle className="w-3.5 h-3.5 sm:w-6 sm:h-6" />
           </div>
         </div>
       </div>
