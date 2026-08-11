@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import { SITE_DATA } from '../config/siteData';
 import { getAllQueries, updateQueryStatus } from '../services/query.service';
 import {
   Inbox,
@@ -128,19 +129,20 @@ const AdminDashboardPage = () => {
       {/* Standalone Admin Top Navigation Bar */}
       <header className="bg-white border-b border-blue-100 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 sm:gap-3 shrink">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-blue-600 flex items-center justify-center text-yellow-300 shadow-md shadow-blue-600/20 shrink-0">
-              <Key className="w-4 h-4 sm:w-5 sm:h-5 -rotate-45" />
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-yellow-400 flex items-center justify-center text-blue-950 shadow-md shadow-yellow-400/30 shrink-0">
+              <Key className="w-5 h-5 sm:w-6 sm:h-6 -rotate-45" />
             </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-base sm:text-xl font-black text-blue-950 tracking-tight">KeyMaker</span>
-                <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-extrabold uppercase bg-blue-600 text-white shrink-0">
+            <div className="min-w-0 text-left">
+              <div className="flex items-center gap-1">
+                <span className="text-base sm:text-2xl font-black text-blue-950 tracking-tight">{SITE_DATA.brandName}</span>
+                <span className="text-base sm:text-2xl font-black text-yellow-500">.</span>
+                <span className="px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full text-[9px] sm:text-[10px] font-extrabold uppercase bg-blue-600 text-white shrink-0 ml-1">
                   Admin
                 </span>
               </div>
-              <p className="text-[9px] sm:text-[10px] font-semibold text-slate-400 truncate max-w-[140px] sm:max-w-none">
-                {admin?.email}
+              <p className="text-[9px] sm:text-[11px] font-bold text-slate-600 tracking-tight hidden sm:block">
+                {SITE_DATA.hindiTagline}
               </p>
             </div>
           </div>
@@ -230,23 +232,23 @@ const AdminDashboardPage = () => {
         </div>
       </div>
 
-      {/* Control Bar: Search & Status Filters */}
-      <div className="bg-white p-4 rounded-2xl border border-blue-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      {/* Control Bar: Search & Status Filters (Single Row on Mobile) */}
+      <div className="bg-white p-2.5 sm:p-4 rounded-2xl border border-blue-100 shadow-sm flex flex-row items-center justify-between gap-2 sm:gap-4 w-full">
         {/* Status Filter Buttons */}
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <button
             onClick={() => setStatusFilter('')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
               statusFilter === ''
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                ? 'bg-blue-600 text-white shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
-            All Queries
+            All
           </button>
           <button
             onClick={() => setStatusFilter('pending')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
               statusFilter === 'pending'
                 ? 'bg-yellow-400 text-yellow-950 shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -256,17 +258,17 @@ const AdminDashboardPage = () => {
           </button>
           <button
             onClick={() => setStatusFilter('in-progress')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
               statusFilter === 'in-progress'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                ? 'bg-blue-600 text-white shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
-            In-Progress
+            Progress
           </button>
           <button
             onClick={() => setStatusFilter('resolved')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
               statusFilter === 'resolved'
                 ? 'bg-blue-800 text-white shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -277,14 +279,14 @@ const AdminDashboardPage = () => {
         </div>
 
         {/* Search Input Form */}
-        <form onSubmit={handleSearchSubmit} className="relative w-full md:w-72">
-          <Search className="w-4 h-4 text-blue-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-[160px] sm:max-w-72 min-w-0">
+          <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search name, email, query..."
-            className="w-full light-input rounded-xl pl-10 pr-4 py-2 text-xs font-medium transition-all placeholder:text-slate-400"
+            placeholder="Search..."
+            className="w-full light-input rounded-xl pl-7 pr-2 py-1.5 text-[10px] sm:text-xs font-medium transition-all placeholder:text-slate-400"
           />
         </form>
       </div>

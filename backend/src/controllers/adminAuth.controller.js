@@ -12,13 +12,46 @@ import { sendOtpEmail } from '../utils/email.service.js';
 import { detectOtpPurpose } from '../utils/otp.utils.js';
 
 /**
- * @desc    Send OTP for Admin Registration
+ * @desc    Check if an admin account already exists (Public)
+ * @route   GET /api/admin/auth/check-admin-exists
+ * @access  Public
+ */
+export const checkAdminExists = async (req, res) => {
+  try {
+    const count = await Admin.countDocuments();
+    return res.status(200).json({
+      success: true,
+      hasAdmin: count > 0,
+      adminCount: count,
+    });
+  } catch (error) {
+    console.error('Error checking admin existence:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error checking admin existence.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc    Send OTP for Admin Registration (Allowed ONLY for first admin setup)
  * @route   POST /api/admin/auth/send-register-otp
  * @access  Public
  */
 export const sendAdminRegistrationOtp = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
+    // STRICT SINGLE ADMIN POLICY: Check if an admin already exists in the system
+    const existingAdminCount = await Admin.countDocuments();
+    if (existingAdminCount >= 1) {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin account already exists. Only 1 admin account is allowed on this platform.',
+        hasAdmin: true,
+      });
+    }
 
     // Automatically detect OTP purpose from URL path (/admin => admin_registration)
     const purpose = detectOtpPurpose(req);
@@ -47,14 +80,6 @@ export const sendAdminRegistrationOtp = async (req, res) => {
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    const existingAdmin = await Admin.findOne({ email: normalizedEmail });
-    if (existingAdmin) {
-      return res.status(400).json({
-        success: false,
-        message: 'Admin with this email already exists.',
-      });
-    }
-
     // Generate 6-digit OTP
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -73,7 +98,7 @@ export const sendAdminRegistrationOtp = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Verification OTP sent to your email. Please enter it to complete registration.',
+      message: 'Verification OTP sent to your email. Please enter it to complete first-time admin setup.',
       otpSent: true,
       purpose,
     });
@@ -88,13 +113,23 @@ export const sendAdminRegistrationOtp = async (req, res) => {
 };
 
 /**
- * @desc    Verify OTP and Register a new Admin account
+ * @desc    Verify OTP and Register Admin account (Allowed ONLY for first admin setup)
  * @route   POST /api/admin/auth/register
  * @access  Public
  */
 export const registerAdmin = async (req, res) => {
   try {
     const { name, email, password, otp } = req.body;
+
+    // STRICT SINGLE ADMIN POLICY: Check if an admin already exists in the system
+    const existingAdminCount = await Admin.countDocuments();
+    if (existingAdminCount >= 1) {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin account already exists. Only 1 admin account is allowed on this platform.',
+        hasAdmin: true,
+      });
+    }
 
     // Automatically detect OTP purpose from URL path (/admin => admin_registration)
     const purpose = detectOtpPurpose(req);

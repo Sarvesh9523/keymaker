@@ -1,7 +1,15 @@
 import { http } from '../api/api';
 
 /**
- * Send OTP for Admin Registration
+ * Check if an admin account already exists in the database
+ */
+export const checkAdminExists = async () => {
+  const response = await http.get('/admin/auth/check-admin-exists');
+  return response.data;
+};
+
+/**
+ * Send OTP for Admin Registration (First Time Setup ONLY)
  * @param {Object} adminData - { name, email, password }
  */
 export const sendAdminRegisterOtp = async (adminData) => {
@@ -10,7 +18,7 @@ export const sendAdminRegisterOtp = async (adminData) => {
 };
 
 /**
- * Verify OTP & Register a new Admin account
+ * Verify OTP & Register Admin account (First Time Setup ONLY)
  * @param {Object} adminData - { name, email, password, otp }
  */
 export const registerAdmin = async (adminData) => {

@@ -18,18 +18,22 @@ const Footer = () => {
           {/* Column 1: Brand Info */}
           <div className="lg:col-span-5 space-y-2.5 text-left">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-yellow-300 shadow-md shadow-blue-600/20">
-                <Key className="w-5 h-5 -rotate-45" />
+              <div className="w-11 h-11 rounded-2xl bg-yellow-400 flex items-center justify-center text-blue-950 shadow-md shadow-yellow-400/30">
+                <Key className="w-6 h-6 -rotate-45" />
               </div>
-              <span className="text-xl font-extrabold text-blue-950 tracking-tight">{SITE_DATA.brandName} Support</span>
+              <div>
+                <div className="flex items-center gap-1">
+                  <span className="text-2xl font-black text-blue-950 tracking-tight">{SITE_DATA.brandName}</span>
+                  <span className="text-2xl font-black text-yellow-500">.</span>
+                </div>
+                <p className="text-[11px] font-bold text-slate-600 tracking-tight">
+                  {SITE_DATA.hindiTagline}
+                </p>
+              </div>
             </div>
             <p className="text-xs text-slate-500 font-medium leading-relaxed">
-              Fast, 24x7 locksmith support query system with verified ticket generation and instant arrival.
+              Fast, 24x7 locksmith support query system with instant ticket generation and arrival.
             </p>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-[11px] font-bold">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span>{SITE_DATA.hindiTagline}</span>
-            </div>
           </div>
 
           {/* Columns 2 & 3 in SAME ROW (2-Column Grid on Mobile) */}

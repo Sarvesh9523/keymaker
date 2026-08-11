@@ -20,6 +20,7 @@ import {
   Car,
   Bike,
   ThumbsUp,
+  Wrench,
 } from 'lucide-react';
 
 const HomePage = () => {
@@ -248,8 +249,8 @@ const HomePage = () => {
             </p>
           </div>
 
-          {/* 7 Services Grid Cards (3 Columns Grid on Mobile Screen) */}
-          <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6">
+          {/* 8 Services Grid Cards (3 Columns Grid) */}
+          <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-4 md:gap-6">
             
             {/* Card 1: Car Key Duplication */}
             <div className="bg-slate-50 rounded-2xl sm:rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-200 group flex flex-col justify-between">
@@ -441,6 +442,64 @@ const HomePage = () => {
                 <div className="p-2 sm:p-4 text-left space-y-0.5 sm:space-y-1">
                   <h3 className="text-[10px] sm:text-sm md:text-base font-black text-blue-950 leading-tight">Remote Key Repair</h3>
                   <p className="text-[8px] sm:text-xs font-semibold text-slate-500">Remote, Key Shell, Battery Replacement & Circuit Repair</p>
+                </div>
+              </div>
+              <div className="p-1.5 sm:p-3 bg-white border-t border-slate-200">
+                <button
+                  onClick={scrollToQueryForm}
+                  className="w-full py-1.5 px-2 sm:py-2.5 sm:px-3 rounded-lg sm:rounded-xl font-extrabold text-[9px] sm:text-xs bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center gap-1"
+                >
+                  <span>Book Service</span>
+                  <CheckCircle className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Card 8: Customize Key Service */}
+            <div className="bg-slate-50 rounded-2xl sm:rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-200 group flex flex-col justify-between">
+              <div>
+                <div className="relative h-24 sm:h-36 md:h-44 w-full overflow-hidden bg-slate-200">
+                  <img
+                    src="/assets/services/smart_key.jpg"
+                    alt="Customize Key Service"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute bottom-1.5 left-1.5 sm:bottom-3 sm:left-3 w-6 h-6 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-xl sm:rounded-2xl bg-blue-950 text-yellow-400 flex items-center justify-center shadow-lg border-2 border-white">
+                    <Wrench className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                  </div>
+                </div>
+                <div className="p-2 sm:p-4 text-left space-y-0.5 sm:space-y-1">
+                  <h3 className="text-[10px] sm:text-sm md:text-base font-black text-blue-950 leading-tight">Customize Key Service</h3>
+                  <p className="text-[8px] sm:text-xs font-semibold text-slate-500 line-clamp-2">Custom Flip Key Shells, Laser Cuts & Styling</p>
+                </div>
+              </div>
+              <div className="p-1.5 sm:p-3 bg-white border-t border-slate-200">
+                <button
+                  onClick={scrollToQueryForm}
+                  className="w-full py-1.5 px-2 sm:py-2.5 sm:px-3 rounded-lg sm:rounded-xl font-extrabold text-[9px] sm:text-xs bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center gap-1"
+                >
+                  <span>Book Service</span>
+                  <CheckCircle className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Card 9: All Keys Lost Solution */}
+            <div className="bg-slate-50 rounded-2xl sm:rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-200 group flex flex-col justify-between">
+              <div>
+                <div className="relative h-24 sm:h-36 md:h-44 w-full overflow-hidden bg-slate-200">
+                  <img
+                    src="/assets/services/bike_key.jpg"
+                    alt="Any Service related keys"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute bottom-1.5 left-1.5 sm:bottom-3 sm:left-3 w-6 h-6 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-xl sm:rounded-2xl bg-blue-950 text-yellow-400 flex items-center justify-center shadow-lg border-2 border-white">
+                    <Key className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                  </div>
+                </div>
+                <div className="p-2 sm:p-4 text-left space-y-0.5 sm:space-y-1">
+                  <h3 className="text-[10px] sm:text-sm md:text-base font-black text-blue-950 leading-tight">Any Service related keys</h3>
+                  <p className="text-[8px] sm:text-xs font-semibold text-slate-500 line-clamp-2">Complete Key Generation when All Original Keys are Lost</p>
                 </div>
               </div>
               <div className="p-1.5 sm:p-3 bg-white border-t border-slate-200">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
@@ -7,7 +7,9 @@ import {
   sendAdminRegisterOtp,
   sendAdminForgotPasswordOtp,
   resetAdminPasswordWithOtp,
+  checkAdminExists,
 } from '../services/auth.service';
+import { SITE_DATA } from '../config/siteData';
 import {
   ShieldCheck,
   Lock,
@@ -20,11 +22,19 @@ import {
   RotateCcw,
   Send,
   HelpCircle,
+  Key,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 const AdminLoginPage = () => {
   // mode: 'login' | 'register' | 'forgot'
   const [mode, setMode] = useState('login');
+  const [hasAdmin, setHasAdmin] = useState(true); // Default to locked registration
+
+  // Show/Hide password toggles
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -39,6 +49,23 @@ const AdminLoginPage = () => {
 
   const { login, register } = useAuth();
   const navigate = useNavigate();
+
+  // Check if an admin already exists in the system on mount
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const data = await checkAdminExists();
+        setHasAdmin(data.hasAdmin);
+        if (data.hasAdmin) {
+          setMode('login');
+        }
+      } catch (err) {
+        console.error('Check admin existence error:', err);
+        setHasAdmin(true); // Default to secure single admin state
+      }
+    };
+    checkStatus();
+  }, []);
 
   // Compute live password validation
   const targetPassword = mode === 'forgot' ? formData.newPassword : formData.password;
@@ -57,9 +84,14 @@ const AdminLoginPage = () => {
     setOtpSent(false);
   };
 
-  // Step 1 for Registration: Send OTP
+  // Step 1 for Registration: Send OTP (Initial Setup ONLY)
   const handleSendRegisterOtp = async (e) => {
     e.preventDefault();
+
+    if (hasAdmin) {
+      toast.error('Admin account already exists. Only 1 admin is allowed on this platform.');
+      return;
+    }
 
     if (!formData.name.trim()) {
       toast.error('Please enter your full name.');
@@ -94,9 +126,14 @@ const AdminLoginPage = () => {
     }
   };
 
-  // Step 2 for Registration: Verify OTP & Register
+  // Step 2 for Registration: Verify OTP & Register (Initial Setup ONLY)
   const handleVerifyRegister = async (e) => {
     e.preventDefault();
+
+    if (hasAdmin) {
+      toast.error('Admin account already exists. Only 1 admin is allowed on this platform.');
+      return;
+    }
 
     if (!otp || otp.trim().length !== 6) {
       toast.error('Please enter the 6-digit OTP code sent to your email.');
@@ -107,7 +144,8 @@ const AdminLoginPage = () => {
 
     try {
       await register(formData.name, formData.email, formData.password, otp.trim());
-      toast.success('Admin account created successfully! Welcome to Dashboard.');
+      setHasAdmin(true);
+      toast.success('Initial Admin setup completed! Welcome to Dashboard.');
       navigate('/admin/dashboard');
     } catch (err) {
       console.error('Verify registration error:', err);
@@ -206,29 +244,43 @@ const AdminLoginPage = () => {
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-100 rounded-full blur-3xl pointer-events-none opacity-70" />
 
       <div className="w-full max-w-md relative z-10 my-auto">
-        {/* Header Icon */}
+        {/* Header KeyMaker Logo */}
         <div className="text-center mb-6">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-blue-600 flex items-center justify-center mx-auto mb-3 text-yellow-300 shadow-xl shadow-blue-600/20">
-            <ShieldCheck className="w-7 h-7 sm:w-8 sm:h-8" />
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-blue-950 shadow-md shadow-yellow-400/30">
+              <Key className="w-7 h-7 -rotate-45" />
+            </div>
+            <div className="text-left">
+              <div className="flex items-center gap-1">
+                <span className="text-2xl font-black text-blue-950 tracking-tight">{SITE_DATA.brandName}</span>
+                <span className="text-2xl font-black text-yellow-500">.</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-blue-600 text-white ml-1">
+                  Admin
+                </span>
+              </div>
+              <p className="text-[11px] font-bold text-slate-600 tracking-tight">
+                {SITE_DATA.hindiTagline}
+              </p>
+            </div>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-blue-950">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-blue-950">
             {mode === 'forgot'
               ? 'Reset Admin Password'
               : mode === 'register'
-              ? 'Create Admin Account'
+              ? 'Setup First Admin Account'
               : 'Admin Portal Login'}
           </h2>
-          <p className="mt-1.5 text-xs font-semibold text-slate-500">
+          <p className="mt-1 text-xs font-semibold text-slate-500">
             {mode === 'forgot'
               ? 'OTP Email Verification & Password Recovery'
               : mode === 'register'
-              ? 'OTP Email Verification Required'
+              ? 'Initial Admin Setup (Allowed ONCE)'
               : 'Token Rotation • Access Token in Memory'}
           </p>
         </div>
 
-        {/* Tab Selector (Sign In vs Register) */}
-        {mode !== 'forgot' && (
+        {/* Tab Selector (Sign In vs Register - ONLY SHOWN IF NO ADMIN EXISTS YET) */}
+        {mode !== 'forgot' && !hasAdmin && (
           <div className="flex bg-blue-50 p-1.5 rounded-2xl border border-blue-200 mb-6">
             <button
               type="button"
@@ -250,8 +302,18 @@ const AdminLoginPage = () => {
                   : 'text-slate-600 hover:text-blue-700'
               }`}
             >
-              Register Admin
+              Setup First Admin
             </button>
+          </div>
+        )}
+
+        {/* Single Admin Lock Security Badge */}
+        {mode === 'login' && hasAdmin && (
+          <div className="mb-4 text-center">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-[11px] font-bold">
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+              <span>🔒 Single Admin Platform • Registration Locked</span>
+            </span>
           </div>
         )}
 
@@ -298,14 +360,21 @@ const AdminLoginPage = () => {
                 <div className="relative">
                   <Lock className="w-4 h-4 text-blue-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     name="password"
                     required
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="••••••••••••"
-                    className="w-full light-input rounded-xl pl-10 pr-4 py-2.5 text-sm transition-all placeholder:text-slate-400 font-medium"
+                    className="w-full light-input rounded-xl pl-10 pr-10 py-2.5 text-sm transition-all placeholder:text-slate-400 font-medium"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 focus:outline-none p-1 rounded-lg transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
@@ -330,9 +399,9 @@ const AdminLoginPage = () => {
           )}
 
           {/* ========================================== */}
-          {/* 2. ADMIN REGISTRATION FORM WITH OTP        */}
+          {/* 2. FIRST-TIME ADMIN REGISTRATION FORM       */}
           {/* ========================================== */}
-          {mode === 'register' && (
+          {mode === 'register' && !hasAdmin && (
             <form onSubmit={otpSent ? handleVerifyRegister : handleSendRegisterOtp} className="space-y-4 animate-fadeIn">
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -380,14 +449,21 @@ const AdminLoginPage = () => {
                   <div className="relative">
                     <Lock className="w-4 h-4 text-blue-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       name="password"
                       required
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="••••••••••••"
-                      className="w-full light-input rounded-xl pl-10 pr-4 py-2.5 text-sm transition-all placeholder:text-slate-400 font-medium"
+                      className="w-full light-input rounded-xl pl-10 pr-10 py-2.5 text-sm transition-all placeholder:text-slate-400 font-medium"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 focus:outline-none p-1 rounded-lg transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
 
                   {/* Real-time Password Strength Requirements */}
@@ -466,7 +542,7 @@ const AdminLoginPage = () => {
                 ) : (
                   <>
                     <ShieldCheck className="w-4 h-4 text-yellow-300" />
-                    <span>{otpSent ? 'Verify OTP & Complete Registration' : 'Send Verification OTP'}</span>
+                    <span>{otpSent ? 'Verify OTP & Complete Initial Setup' : 'Send Setup Verification OTP'}</span>
                   </>
                 )}
               </button>
@@ -570,14 +646,21 @@ const AdminLoginPage = () => {
                     <div className="relative">
                       <Lock className="w-4 h-4 text-blue-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
-                        type="password"
+                        type={showNewPassword ? 'text' : 'password'}
                         name="newPassword"
                         required
                         value={formData.newPassword}
                         onChange={handleChange}
                         placeholder="••••••••••••"
-                        className="w-full light-input rounded-xl pl-10 pr-4 py-2.5 text-sm transition-all placeholder:text-slate-400 font-medium"
+                        className="w-full light-input rounded-xl pl-10 pr-10 py-2.5 text-sm transition-all placeholder:text-slate-400 font-medium"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 focus:outline-none p-1 rounded-lg transition-colors"
+                      >
+                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
 
                     {/* Real-time Password Security Criteria */}
