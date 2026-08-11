@@ -197,7 +197,7 @@ const PublicQueryPage = () => {
                       required
                       value={formData.name}
                       onChange={handleChange}
-                      placeholder="e.g. Sanjiv Singh"
+                      placeholder="Enter Your Name"
                       className="w-full light-input rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm transition-all placeholder:text-slate-400 font-medium"
                     />
                   </div>

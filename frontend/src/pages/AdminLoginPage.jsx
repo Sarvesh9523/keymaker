@@ -347,7 +347,7 @@ const AdminLoginPage = () => {
                     disabled={otpSent}
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="e.g. Sanjiv Singh"
+                    placeholder="Enter Your Name"
                     className="w-full light-input rounded-xl pl-10 pr-4 py-2.5 text-sm transition-all placeholder:text-slate-400 font-medium disabled:bg-slate-100"
                   />
                 </div>
@@ -366,7 +366,7 @@ const AdminLoginPage = () => {
                     disabled={otpSent}
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="sanjiv@example.com"
+                    placeholder="username@example.com"
                     className="w-full light-input rounded-xl pl-10 pr-4 py-2.5 text-sm transition-all placeholder:text-slate-400 font-medium disabled:bg-slate-100"
                   />
                 </div>
