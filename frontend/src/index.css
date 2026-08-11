@@ -56,45 +56,62 @@
 }
 
 /* ========================================== */
-/* ANIMATED KEY & LOCK LOADER KEYFRAMES       */
+/* ULTRA-SMOOTH 3D KEY & LOCK OPENING         */
+/* Total Loop: 3.2s (60 FPS GPU Accelerated)  */
 /* ========================================== */
-@keyframes lockShackleOpen {
-  0%, 25% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50%, 85% {
-    transform: translateY(-9px) rotate(-16deg);
-    transform-origin: 34px 28px;
-  }
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-}
-
-@keyframes keyInsertTurn {
+@keyframes key3dTurn {
   0% {
-    transform: translateY(16px) rotate(0deg);
-    opacity: 0.3;
+    transform: translateY(0px) rotateY(-28deg) rotateX(12deg) rotateZ(0deg);
   }
-  30% {
-    transform: translateY(0px) rotate(0deg);
-    opacity: 1;
+  20% {
+    /* Holds initial 3D posture */
+    transform: translateY(0px) rotateY(-28deg) rotateX(12deg) rotateZ(0deg);
   }
-  55%, 80% {
-    transform: translateY(0px) rotate(90deg);
-    transform-origin: 50px 56px;
-    opacity: 1;
+  42% {
+    /* Smooth 90deg turn inside keyhole */
+    transform: translateY(0px) rotateZ(90deg) rotateY(28deg) rotateX(-8deg);
+    transform-origin: 60px 68px;
   }
-  100% {
-    transform: translateY(16px) rotate(0deg);
-    opacity: 0.3;
+  72% {
+    /* Holds turned position while lock is open */
+    transform: translateY(0px) rotateZ(90deg) rotateY(28deg) rotateX(-8deg);
+    transform-origin: 60px 68px;
+  }
+  92%, 100% {
+    /* Glides back to baseline */
+    transform: translateY(0px) rotateY(-28deg) rotateX(12deg) rotateZ(0deg);
   }
 }
 
-.animate-lockShackle {
-  animation: lockShackleOpen 2.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+@keyframes shackle3dOpen {
+  0%, 30% {
+    /* Stays closed while key is turning */
+    transform: translateY(0px) rotateY(0deg) rotateX(0deg);
+  }
+  50% {
+    /* Smoothly springs open in 3D */
+    transform: translateY(-18px) rotateY(40deg) rotateX(-14deg);
+    transform-origin: 40px 32px;
+  }
+  75% {
+    /* Holds unlocked view */
+    transform: translateY(-18px) rotateY(40deg) rotateX(-14deg);
+    transform-origin: 40px 32px;
+  }
+  95%, 100% {
+    /* Softly closes down */
+    transform: translateY(0px) rotateY(0deg) rotateX(0deg);
+  }
 }
 
-.animate-keyTurn {
-  animation: keyInsertTurn 2.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+.animate-shackle3dOpen {
+  animation: shackle3dOpen 3.2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.animate-key3dTurn {
+  animation: key3dTurn 3.2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+  transform-style: preserve-3d;
+  will-change: transform;
 }

@@ -19,9 +19,12 @@ export const AuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // App Startup Session Validation via validateSessionOnStartup()
+  // App Startup Session Validation with Minimum Display Timer for 3D Loader
   useEffect(() => {
     const initSession = async () => {
+      const startTime = Date.now();
+      const minLoaderTime = 1600; // Minimum 1.6s display to show 3D KeyLockLoader on startup
+
       try {
         const sessionResult = await validateSessionOnStartup();
         if (sessionResult.success) {
@@ -33,7 +36,11 @@ export const AuthProvider = ({ children }) => {
       } catch (err) {
         setAdmin(null);
       } finally {
-        setLoading(false);
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, minLoaderTime - elapsedTime);
+        setTimeout(() => {
+          setLoading(false);
+        }, remainingTime);
       }
     };
 
@@ -80,7 +87,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (loading) {
-    return <KeyLockLoader text="Verifying Secure Session..." fullScreen={true} />;
+    return <KeyLockLoader text="Initializing KeyMaker Portal..." fullScreen={true} />;
   }
 
   return (

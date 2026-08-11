@@ -54,6 +54,8 @@ const PublicQueryPage = () => {
       return;
     }
 
+    const startTime = Date.now();
+    const minLoaderTime = 1600;
     setSubmitting(true);
 
     try {
@@ -67,7 +69,11 @@ const PublicQueryPage = () => {
       console.error('Submit query error:', err);
       toast.error(err.response?.data?.message || 'Failed to submit query. Please try again.');
     } finally {
-      setSubmitting(false);
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoaderTime - elapsedTime);
+      setTimeout(() => {
+        setSubmitting(false);
+      }, remainingTime);
     }
   };
 

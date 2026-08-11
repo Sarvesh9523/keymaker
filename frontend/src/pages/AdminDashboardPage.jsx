@@ -45,6 +45,8 @@ const AdminDashboardPage = () => {
   };
 
   const fetchQueries = async () => {
+    const startTime = Date.now();
+    const minLoaderTime = 1600;
     setLoading(true);
     setError('');
     try {
@@ -59,7 +61,11 @@ const AdminDashboardPage = () => {
       setError(err.response?.data?.message || 'Failed to fetch client queries.');
       toast.error(err.response?.data?.message || 'Failed to fetch client queries.');
     } finally {
-      setLoading(false);
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoaderTime - elapsedTime);
+      setTimeout(() => {
+        setLoading(false);
+      }, remainingTime);
     }
   };
 
