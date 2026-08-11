@@ -21,13 +21,14 @@ export const generateRefreshToken = (adminId) => {
 };
 
 /**
- * Send Refresh Token as HttpOnly cookie
+ * Send Refresh Token as HttpOnly cookie (Cross-Site Compatible for Vercel + Render)
  */
 export const sendRefreshTokenCookie = (res, refreshToken) => {
+  const isProd = process.env.NODE_ENV === 'production';
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
   };
 
@@ -38,9 +39,10 @@ export const sendRefreshTokenCookie = (res, refreshToken) => {
  * Clear Refresh Token cookie
  */
 export const clearRefreshTokenCookie = (res) => {
+  const isProd = process.env.NODE_ENV === 'production';
   res.clearCookie('refreshToken', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
   });
 };

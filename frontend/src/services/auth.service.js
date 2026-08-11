@@ -28,6 +28,24 @@ export const loginAdmin = async (credentials) => {
 };
 
 /**
+ * Send OTP for Admin Forgot Password Reset
+ * @param {Object} data - { email }
+ */
+export const sendAdminForgotPasswordOtp = async (data) => {
+  const response = await http.post('/admin/auth/send-forgot-password-otp', data);
+  return response.data;
+};
+
+/**
+ * Reset Admin Password with Verified OTP
+ * @param {Object} data - { email, otp, newPassword }
+ */
+export const resetAdminPasswordWithOtp = async (data) => {
+  const response = await http.post('/admin/auth/reset-password', data);
+  return response.data;
+};
+
+/**
  * Logout Admin
  */
 export const logoutAdmin = async () => {

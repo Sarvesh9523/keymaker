@@ -383,3 +383,145 @@ export const getAdminProfile = async (req, res) => {
     });
   }
 };
+
+/**
+ * @desc    Send OTP for Admin Password Reset
+ * @route   POST /api/admin/auth/send-forgot-password-otp
+ * @access  Public
+ */
+export const sendAdminForgotPasswordOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide your registered email address.',
+      });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email address format.',
+      });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const admin = await Admin.findOne({ email: normalizedEmail });
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'No registered admin account found with this email address.',
+      });
+    }
+
+    // Generate 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Delete any existing OTP for this email and purpose
+    await Otp.deleteMany({ email: normalizedEmail, purpose: 'admin_forgot_password' });
+
+    // Save new OTP record
+    await Otp.create({
+      email: normalizedEmail,
+      otp: otpCode,
+      purpose: 'admin_forgot_password',
+    });
+
+    // Send OTP email
+    await sendOtpEmail(normalizedEmail, otpCode, 'admin_forgot_password');
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset OTP code sent to your email address.',
+      otpSent: true,
+    });
+  } catch (error) {
+    console.error('Error sending admin forgot password OTP:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error sending password reset OTP.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc    Verify OTP and Reset Admin Password
+ * @route   POST /api/admin/auth/reset-password
+ * @access  Public
+ */
+export const resetAdminPasswordWithOtp = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email, 6-digit OTP code, and new password.',
+      });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email address format.',
+      });
+    }
+
+    const passwordValidation = isValidPassword(newPassword);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: passwordValidation.message,
+      });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const otpString = String(otp).trim();
+
+    // Verify OTP in Database
+    const otpRecord = await Otp.findOne({
+      email: normalizedEmail,
+      purpose: 'admin_forgot_password',
+    });
+
+    if (!otpRecord || otpRecord.otp !== otpString) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired 6-digit OTP code.',
+      });
+    }
+
+    // OTP is valid! Find admin and update password
+    const admin = await Admin.findOne({ email: normalizedEmail });
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin account not found.',
+      });
+    }
+
+    // Update password & clear old tokens
+    admin.password = newPassword;
+    admin.refreshTokens = [];
+    await admin.save();
+
+    // Delete OTP record
+    await Otp.deleteOne({ _id: otpRecord._id });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset successfully! Please log in with your new password.',
+    });
+  } catch (error) {
+    console.error('Error resetting admin password:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error resetting admin password.',
+      error: error.message,
+    });
+  }
+};
