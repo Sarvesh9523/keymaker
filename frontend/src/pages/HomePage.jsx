@@ -65,8 +65,8 @@ const HomePage = () => {
               </p>
             </div>
 
-            {/* 5 Feature Icons Row */}
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3 pt-1 pb-1">
+            {/* 4 Feature Icons Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-1 pb-1">
               <div className="flex items-center gap-1.5 sm:gap-2 bg-white p-2 sm:p-2.5 rounded-xl border border-slate-200 shadow-sm text-left">
                 <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
                 <div>
@@ -92,14 +92,6 @@ const HomePage = () => {
               </div>
 
               <div className="flex items-center gap-1.5 sm:gap-2 bg-white p-2 sm:p-2.5 rounded-xl border border-slate-200 shadow-sm text-left">
-                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
-                <div>
-                  <div className="text-[10px] sm:text-[11px] font-black text-blue-950 leading-none">Damage Free</div>
-                  <div className="text-[8px] sm:text-[9px] font-bold text-slate-400 mt-0.5">Service</div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5 sm:gap-2 bg-white p-2 sm:p-2.5 rounded-xl border border-slate-200 shadow-sm text-left sm:col-span-1">
                 <BadgeIndianRupee className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
                 <div>
                   <div className="text-[10px] sm:text-[11px] font-black text-blue-950 leading-none">Affordable</div>
