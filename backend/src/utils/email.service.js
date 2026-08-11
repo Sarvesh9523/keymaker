@@ -1,31 +1,21 @@
+import nodemailer from 'nodemailer';
+
 /**
- * Send Transactional Email using Brevo REST API v3
- * Endpoint: POST https://api.brevo.com/v3/smtp/email
+ * Send Transactional Email
+ * Tries Brevo HTTP REST API v3 first (no host/port timeouts).
+ * Falls back to Nodemailer SMTP if API returns an error or if SMTP credentials are used.
  */
 const sendBrevoEmail = async ({ to, subject, htmlContent }) => {
-  const apiKey = process.env.BREVO_API_KEY;
-  const senderEmail = process.env.EMAIL_FROM;
-  const senderName = process.env.EMAIL_SENDER_NAME;
+  const apiKey = process.env.BREVO_API_KEY || process.env.SMTP_PASS;
+  const senderEmail = process.env.EMAIL_FROM || 'no-reply@keymaker.com';
+  const senderName = process.env.EMAIL_SENDER_NAME || 'Sanjiv Keymaker';
 
   if (!apiKey) {
-    console.warn('[Email Service Warning] BREVO_API_KEY is not configured. Email will not be sent.');
+    console.warn('[Email Service Warning] Neither BREVO_API_KEY nor SMTP credentials configured. Email skipped.');
     return false;
   }
 
-  const payload = {
-    sender: {
-      name: 'Sanjiv Keymaker',
-      email: senderEmail,
-    },
-    to: [
-      {
-        email: to,
-      },
-    ],
-    subject,
-    htmlContent,
-  };
-
+  // 1. Always attempt Brevo HTTP REST API v3 first
   try {
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
@@ -34,23 +24,58 @@ const sendBrevoEmail = async ({ to, subject, htmlContent }) => {
         'api-key': apiKey,
         'content-type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        sender: { name: senderName, email: senderEmail },
+        to: [{ email: to }],
+        subject,
+        htmlContent,
+      }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('[Email Service Error] Brevo REST API returned error:', response.status, errorData);
-      return false;
+    if (response.ok) {
+      const data = await response.json();
+      console.log('[Email Service] Sent via Brevo REST API v3. Message ID:', data.messageId);
+      return true;
     }
 
-    const data = await response.json();
-    console.log('[Email Service] Email sent successfully via Brevo REST API. Message ID:', data.messageId);
+    const errorData = await response.json().catch(() => ({}));
+    console.warn('[Email Service] Brevo REST API returned:', response.status, errorData.message || errorData);
+  } catch (err) {
+    console.error('[Email Service Error] Brevo REST API fetch failed:', err.message);
+  }
+
+  // 2. Fallback to Nodemailer SMTP
+  try {
+    const host = process.env.SMTP_HOST || 'smtp-relay.brevo.com';
+    const port = parseInt(process.env.SMTP_PORT || '587', 10);
+    const user = process.env.SMTP_USER || process.env.EMAIL_FROM || senderEmail;
+
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user,
+        pass: apiKey,
+      },
+    });
+
+    await transporter.sendMail({
+      from: { name: senderName, address: senderEmail },
+      sender: { name: senderName, email: senderEmail },
+      to,
+      subject,
+      html: htmlContent,
+    });
+
+    console.log('[Email Service] Sent successfully via SMTP Fallback.');
     return true;
   } catch (err) {
-    console.error('[Email Service Error] Failed to send email via Brevo REST API:', err.message);
+    console.error('[Email Service Error] SMTP fallback failed:', err.message);
     return false;
   }
 };
+
 
 /**
  * Send OTP Verification Email
