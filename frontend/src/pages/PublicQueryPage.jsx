@@ -13,7 +13,6 @@ import {
   Ticket,
   Clock,
   RotateCcw,
-  Sparkles,
   ShieldCheck,
 } from 'lucide-react';
 
@@ -178,7 +177,7 @@ const PublicQueryPage = () => {
             {/* Card Header Section */}
             <div className="text-center pb-2.5 sm:pb-4 mb-2.5 sm:mb-4 border-b border-slate-100 space-y-1">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-yellow-100 border border-yellow-300 text-yellow-900 text-[9px] sm:text-xs font-black uppercase tracking-wider shadow-sm">
-                <Sparkles className="w-3 h-3 text-yellow-600" />
+                
                 KeyMaker Quick Assistance
               </div>
               <h2 className="text-xl sm:text-4xl font-black text-blue-950 tracking-tight">

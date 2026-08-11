@@ -238,9 +238,6 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto space-y-6 sm:space-y-10">
           
           <div className="text-center space-y-1.5">
-            <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-900 border border-yellow-300 text-[10px] sm:text-xs font-black uppercase tracking-wider">
-              Locksmith Specialization
-            </span>
             <h2 className="text-2xl sm:text-4xl font-black text-blue-950 tracking-tight">
               Our Professional KeyMaker Services
             </h2>

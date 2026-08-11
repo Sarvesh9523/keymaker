@@ -138,7 +138,7 @@ const AdminDashboardPage = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 sm:gap-3 shrink">
             <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-yellow-400 flex items-center justify-center text-blue-950 shadow-md shadow-yellow-400/30 shrink-0">
-              <Key className="w-5 h-5 sm:w-6 sm:h-6 -rotate-45" />
+              <Key className="w-5 h-5 sm:w-6 sm:h-6 rotate-45" />
             </div>
             <div className="min-w-0 text-left">
               <div className="flex items-center gap-1">
@@ -413,7 +413,7 @@ const AdminDashboardPage = () => {
               {/* Header Info */}
               <div className="flex items-center gap-3 pr-8">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-blue-950 shadow-md shadow-yellow-400/30 shrink-0">
-                  <Key className="w-5 h-5 sm:w-6 sm:h-6 -rotate-45" />
+                  <Key className="w-5 h-5 sm:w-6 sm:h-6 rotate-45" />
                 </div>
                 <div className="min-w-0">
                   <h3 className="text-base sm:text-lg font-black text-blue-950 leading-tight">Query Ticket Details</h3>

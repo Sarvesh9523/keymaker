@@ -248,7 +248,7 @@ const AdminLoginPage = () => {
         <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-blue-950 shadow-md shadow-yellow-400/30">
-              <Key className="w-7 h-7 -rotate-45" />
+              <Key className="w-7 h-7 rotate-45" />
             </div>
             <div className="text-left">
               <div className="flex items-center gap-1">

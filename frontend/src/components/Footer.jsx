@@ -1,6 +1,6 @@
 import React from 'react';
 import { SITE_DATA } from '../config/siteData';
-import { Key, Mail, Phone, MapPin, Sparkles, ShieldCheck } from 'lucide-react';
+import { Key, Mail, Phone, MapPin, ShieldCheck } from 'lucide-react';
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -19,7 +19,7 @@ const Footer = () => {
           <div className="lg:col-span-5 space-y-2.5 text-left">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-yellow-400 flex items-center justify-center text-blue-950 shadow-md shadow-yellow-400/30">
-                <Key className="w-6 h-6 -rotate-45" />
+                <Key className="w-6 h-6 rotate-45" />
               </div>
               <div>
                 <div className="flex items-center gap-1">
