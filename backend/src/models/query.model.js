@@ -13,25 +13,25 @@ const querySchema = new mongoose.Schema(
       required: [true, 'Name is required'],
       trim: true,
     },
-    email: {
-      type: String,
-      required: [true, 'Email is required'],
-      trim: true,
-      lowercase: true,
-    },
     phone: {
       type: String,
+      required: [true, 'Mobile number is required'],
       trim: true,
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
       default: '',
     },
     subject: {
       type: String,
       trim: true,
-      default: 'General Inquiry',
+      default: 'General KeyMaker Inquiry',
     },
     message: {
       type: String,
-      required: [true, 'Message is required'],
+      required: [true, 'Query message is required'],
       trim: true,
     },
     status: {

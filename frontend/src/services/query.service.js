@@ -1,29 +1,11 @@
 import { http } from '../api/api';
 
 /**
- * Send OTP verification code to client email
- * @param {Object} queryData - { name, email }
+ * Submit client contact query and receive confirmation ticket
+ * @param {Object} queryData - { name, phone, email, subject, message }
  */
-export const sendClientQueryOtp = async (queryData) => {
-  const response = await http.post('/queries/send-otp', queryData);
-  return response.data;
-};
-
-/**
- * Verify 6-digit OTP code before unlocking query details form
- * @param {Object} verifyData - { email, otp }
- */
-export const verifyClientQueryOtp = async (verifyData) => {
-  const response = await http.post('/queries/verify-otp', verifyData);
-  return response.data;
-};
-
-/**
- * Verify OTP, submit client contact query, and receive confirmation ticket
- * @param {Object} queryDataWithOtp - { name, email, phone, subject, message, otp }
- */
-export const submitClientQuery = async (queryDataWithOtp) => {
-  const response = await http.post('/queries', queryDataWithOtp);
+export const submitClientQuery = async (queryData) => {
+  const response = await http.post('/queries', queryData);
   return response.data;
 };
 

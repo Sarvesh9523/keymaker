@@ -525,7 +525,7 @@ const HomePage = () => {
       {/* ZERO WHITESPACE PADDING ABOVE & BELOW      */}
       {/* ========================================== */}
       <section id="query-form" className="py-0 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-2 sm:px-6">
+        <div className="max-w-7xl mx-auto px-1 sm:px-6">
           <PublicQueryPage />
         </div>
       </section>

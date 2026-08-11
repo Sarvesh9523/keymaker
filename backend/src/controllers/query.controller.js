@@ -1,185 +1,69 @@
 import Query from '../models/query.model.js';
-import Otp from '../models/otp.model.js';
-import { isValidEmail } from '../utils/validators.js';
-import { sendOtpEmail, sendQueryTicketEmail } from '../utils/email.service.js';
-import { detectOtpPurpose } from '../utils/otp.utils.js';
+import { sendQueryTicketEmail } from '../utils/email.service.js';
 
 /**
- * @desc    Send OTP to Client to verify email address
- * @route   POST /api/queries/send-otp
- * @access  Public (No Login Required)
- */
-export const sendClientQueryOtp = async (req, res) => {
-  try {
-    const { name, email } = req.body;
-
-    // Automatically detect OTP purpose from URL path (not having /admin => client_query)
-    const purpose = detectOtpPurpose(req);
-
-    if (!name || !email) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide your name and email address.',
-      });
-    }
-
-    if (!isValidEmail(email)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide a valid email address.',
-      });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Delete previous pending OTPs for this email and purpose
-    await Otp.deleteMany({ email: normalizedEmail, purpose });
-
-    // Save OTP record
-    await Otp.create({
-      email: normalizedEmail,
-      otp: otpCode,
-      purpose,
-    });
-
-    // Send OTP email
-    await sendOtpEmail(normalizedEmail, otpCode, purpose);
-
-    return res.status(200).json({
-      success: true,
-      message: 'Verification OTP sent to your email. Please verify to enter your query details.',
-      otpSent: true,
-      purpose,
-    });
-  } catch (error) {
-    console.error('Error sending client query OTP:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error sending query verification OTP.',
-      error: error.message,
-    });
-  }
-};
-
-/**
- * @desc    Verify Client Email OTP before unlocking query form
- * @route   POST /api/queries/verify-otp
- * @access  Public
- */
-export const verifyClientQueryOtp = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-
-    const purpose = detectOtpPurpose(req);
-
-    if (!email || !otp) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide your email address and 6-digit OTP.',
-      });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-    const otpString = String(otp).trim();
-
-    const otpRecord = await Otp.findOne({
-      email: normalizedEmail,
-      purpose,
-    });
-
-    if (!otpRecord || otpRecord.otp !== otpString) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or expired 6-digit verification OTP.',
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: 'Email verified successfully! You can now enter your query details.',
-      verified: true,
-    });
-  } catch (error) {
-    console.error('Error verifying query OTP:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error verifying OTP code.',
-      error: error.message,
-    });
-  }
-};
-
-/**
- * @desc    Submit a new query after OTP verification & send Confirmation Ticket
+ * @desc    Submit a new KeyMaker support query
  * @route   POST /api/queries
  * @access  Public (No Login Required)
  */
 export const submitQuery = async (req, res) => {
   try {
-    const { name, email, phone, subject, message, otp } = req.body;
+    const { name, phone, email, subject, message } = req.body;
 
-    // Automatically detect OTP purpose from URL path (not having /admin => client_query)
-    const purpose = detectOtpPurpose(req);
-
-    if (!name || !email || !message || !otp) {
+    if (!name || !name.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide name, email, message, and the 6-digit verification OTP.',
+        message: 'Please provide your full name.',
       });
     }
 
-    if (!isValidEmail(email)) {
+    if (!phone || !phone.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide a valid email address.',
+        message: 'Please provide your mobile phone number.',
       });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
-    const otpString = String(otp).trim();
-
-    // Verify OTP in DB using auto-detected purpose
-    const otpRecord = await Otp.findOne({
-      email: normalizedEmail,
-      purpose,
-    });
-
-    if (!otpRecord || otpRecord.otp !== otpString) {
+    if (!message || !message.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired 6-digit verification OTP.',
+        message: 'Please describe your query message.',
       });
     }
-
-    // OTP is valid! Delete OTP from DB
-    await Otp.deleteOne({ _id: otpRecord._id });
 
     // Generate Unique Ticket ID (e.g. KM-8F4A2B9-4921)
     const ticketId = `KM-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const normalizedEmail = email ? email.toLowerCase().trim() : '';
 
     // Create and save the query with Ticket ID
     const newQuery = await Query.create({
       ticketId,
       name: name.trim(),
+      phone: phone.trim(),
       email: normalizedEmail,
-      phone: phone ? phone.trim() : '',
-      subject: subject ? subject.trim() : 'General Inquiry',
+      subject: subject ? subject.trim() : 'General KeyMaker Inquiry',
       message: message.trim(),
     });
 
-    // Send Confirmation Ticket Email
-    await sendQueryTicketEmail(
-      normalizedEmail,
-      name.trim(),
-      ticketId,
-      newQuery.subject,
-      newQuery.message
-    );
+    // Send Confirmation Ticket Email if email provided
+    if (normalizedEmail) {
+      try {
+        await sendQueryTicketEmail(
+          normalizedEmail,
+          name.trim(),
+          ticketId,
+          newQuery.subject,
+          newQuery.message
+        );
+      } catch (emailErr) {
+        console.warn('Query ticket email dispatch notice:', emailErr.message);
+      }
+    }
 
     return res.status(201).json({
       success: true,
-      message: 'Email verified! Query submitted successfully. A confirmation ticket has been sent to your email.',
+      message: 'Query registered successfully! Support ticket generated.',
       ticketId,
       data: newQuery,
     });
@@ -212,6 +96,7 @@ export const getAllQueries = async (req, res) => {
       queryFilter.$or = [
         { ticketId: { $regex: search, $options: 'i' } },
         { name: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } },
         { email: { $regex: search, $options: 'i' } },
         { subject: { $regex: search, $options: 'i' } },
         { message: { $regex: search, $options: 'i' } },

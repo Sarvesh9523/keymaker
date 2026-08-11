@@ -1,7 +1,5 @@
 import express from 'express';
 import {
-  sendClientQueryOtp,
-  verifyClientQueryOtp,
   submitQuery,
   getAllQueries,
   getQueryById,
@@ -12,31 +10,17 @@ import { authenticateAdmin } from '../middlewares/authMiddleware.js';
 const router = express.Router();
 
 // ==========================================
-// CLIENT ROUTES (Public - No Login Required)
+// CLIENT PUBLIC ROUTES (No Login Required)
 // ==========================================
 /**
- * @route   POST /api/queries/send-otp
- * @desc    Send verification OTP to client email (Name & Email)
- * @access  Public
- */
-router.post('/queries/send-otp', sendClientQueryOtp);
-
-/**
- * @route   POST /api/queries/verify-otp
- * @desc    Verify 6-digit OTP code to unlock query details form
- * @access  Public
- */
-router.post('/queries/verify-otp', verifyClientQueryOtp);
-
-/**
  * @route   POST /api/queries
- * @desc    Client submits verified query and gets confirmation ticket
+ * @desc    Client submits query (Name, Phone, Email, Subject, Message)
  * @access  Public
  */
 router.post('/queries', submitQuery);
 
 // ==========================================
-// ADMIN ROUTES (Protected - Admin Access Token Required)
+// ADMIN ROUTES (Protected - Admin Token Required)
 // ==========================================
 /**
  * @route   GET /api/admin/queries
