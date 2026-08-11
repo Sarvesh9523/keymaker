@@ -50,8 +50,51 @@
 }
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* ========================================== */
+/* ANIMATED KEY & LOCK LOADER KEYFRAMES       */
+/* ========================================== */
+@keyframes lockShackleOpen {
+  0%, 25% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50%, 85% {
+    transform: translateY(-9px) rotate(-16deg);
+    transform-origin: 34px 28px;
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+@keyframes keyInsertTurn {
+  0% {
+    transform: translateY(16px) rotate(0deg);
+    opacity: 0.3;
+  }
+  30% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 1;
+  }
+  55%, 80% {
+    transform: translateY(0px) rotate(90deg);
+    transform-origin: 50px 56px;
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(16px) rotate(0deg);
+    opacity: 0.3;
+  }
+}
+
+.animate-lockShackle {
+  animation: lockShackleOpen 2.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+.animate-keyTurn {
+  animation: keyInsertTurn 2.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
 }

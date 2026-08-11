@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { SITE_DATA } from '../config/siteData';
 import { getAllQueries, updateQueryStatus } from '../services/query.service';
+import KeyLockLoader from '../components/KeyLockLoader';
 import {
   Inbox,
   Clock,
@@ -301,10 +302,7 @@ const AdminDashboardPage = () => {
 
       {/* Queries Data Table / Card View */}
       {loading ? (
-        <div className="bg-white rounded-3xl p-12 text-center text-slate-500 border border-blue-100 shadow-sm">
-          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm font-semibold text-slate-600">Loading client queries...</p>
-        </div>
+        <KeyLockLoader text="Loading Client Queries..." fullScreen={false} />
       ) : queries.length === 0 ? (
         <div className="bg-white rounded-3xl p-12 text-center text-slate-500 border border-blue-100 shadow-sm">
           <Inbox className="w-12 h-12 mx-auto text-blue-300 mb-3" />

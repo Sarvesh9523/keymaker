@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { submitClientQuery } from '../services/query.service';
+import KeyLockLoader from '../components/KeyLockLoader';
 import {
   Send,
   CheckCircle2,
@@ -83,6 +84,9 @@ const PublicQueryPage = () => {
 
   return (
     <div className="py-4 px-4 my-0 px-0 sm:px-6 flex flex-col justify-center items-center bg-slate-50 relative w-full">
+      {/* Fullscreen Animated Lock Loader when submitting ticket */}
+      {submitting && <KeyLockLoader text="Dispatching Query Ticket..." fullScreen={true} />}
+
       {/* Ambient background glows */}
       <div className="absolute top-5 left-1/2 -translate-x-1/2 w-72 h-72 sm:w-96 sm:h-96 bg-blue-100 rounded-full blur-3xl pointer-events-none opacity-60" />
       <div className="absolute bottom-5 right-5 w-60 h-60 sm:w-72 sm:h-72 bg-yellow-100 rounded-full blur-3xl pointer-events-none opacity-60" />

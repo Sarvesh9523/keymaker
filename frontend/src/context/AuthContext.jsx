@@ -11,6 +11,7 @@ import {
   logoutAdmin,
   getAdminProfile,
 } from '../services/auth.service';
+import KeyLockLoader from '../components/KeyLockLoader';
 
 const AuthContext = createContext();
 
@@ -77,6 +78,10 @@ export const AuthProvider = ({ children }) => {
       setAdmin(null);
     }
   };
+
+  if (loading) {
+    return <KeyLockLoader text="Verifying Secure Session..." fullScreen={true} />;
+  }
 
   return (
     <AuthContext.Provider
