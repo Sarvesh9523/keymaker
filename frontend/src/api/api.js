@@ -92,51 +92,63 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
+// Internal single-flight refresh helper (prevents concurrent duplicate refresh requests)
+const performTokenRefresh = async () => {
+  if (isRefreshing) {
+    return new Promise((resolve, reject) => {
+      failedQueue.push({ resolve, reject });
+    });
+  }
+
+  isRefreshing = true;
+
+  try {
+    const refreshRes = await axios.post(
+      `${API_BASE_URL}/admin/auth/refresh`,
+      {},
+      { withCredentials: true }
+    );
+
+    const newAccessToken = refreshRes.data.accessToken;
+    setMemoryAccessToken(newAccessToken);
+    GlobalEventBus.emit(GlobalEventBus.REFRESH_SUCCESS, newAccessToken);
+    processQueue(null, newAccessToken);
+    return newAccessToken;
+  } catch (refreshErr) {
+    processQueue(refreshErr, null);
+    clearMemoryAccessToken();
+    return Promise.reject(refreshErr);
+  } finally {
+    isRefreshing = false;
+  }
+};
+
 // ==========================================
 // 4. REQUEST INTERCEPTOR
 // ==========================================
-// Handles:
-// • Access token validation for expiry before sending request
-// • Automatically attaches Authorization header
 apiClient.interceptors.request.use(
   async (config) => {
-    // Skip token check for refresh and auth login requests
+    // Skip token check for refresh and public auth routes
     if (
       config.url?.includes('/admin/auth/refresh') ||
-      config.url?.includes('/admin/auth/login')
+      config.url?.includes('/admin/auth/login') ||
+      config.url?.includes('/admin/auth/check-admin-exists') ||
+      config.url?.includes('/admin/auth/send-register-otp') ||
+      config.url?.includes('/admin/auth/register') ||
+      config.url?.includes('/admin/auth/send-forgot-password-otp') ||
+      config.url?.includes('/admin/auth/reset-password')
     ) {
       return config;
     }
 
     let token = getMemoryAccessToken();
 
-    // Validate access token expiry before request goes out
-    if (token && isAccessTokenExpired(token)) {
-      if (!isRefreshing) {
-        isRefreshing = true;
-        try {
-          const refreshRes = await axios.post(
-            `${API_BASE_URL}/admin/auth/refresh`,
-            {},
-            { withCredentials: true }
-          );
-          token = refreshRes.data.accessToken;
-          setMemoryAccessToken(token);
-          GlobalEventBus.emit(GlobalEventBus.REFRESH_SUCCESS, token);
-          processQueue(null, token);
-        } catch (refreshErr) {
-          processQueue(refreshErr, null);
-          clearMemoryAccessToken();
-          GlobalEventBus.emit(GlobalEventBus.UNAUTHORIZED, refreshErr);
-          GlobalEventBus.emit(GlobalEventBus.LOGOUT, refreshErr);
-          return Promise.reject(refreshErr);
-        } finally {
-          isRefreshing = false;
-        }
-      } else {
-        token = await new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        });
+    // If token is missing or expired, attempt silent refresh before making protected request
+    if (!token || isAccessTokenExpired(token)) {
+      try {
+        token = await performTokenRefresh();
+      } catch (err) {
+        // If refresh fails, let request proceed without header to trigger 401 handling
       }
     }
 
@@ -152,10 +164,6 @@ apiClient.interceptors.request.use(
 // ==========================================
 // 5. RESPONSE INTERCEPTOR
 // ==========================================
-// Handles:
-// • Silent Access Token Refresh
-// • Retry Failed Requests
-// • Auto Logout on Refresh Expiry
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -169,44 +177,14 @@ apiClient.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return apiClient(originalRequest);
-          })
-          .catch((err) => Promise.reject(err));
-      }
-
-      isRefreshing = true;
-
       try {
-        // Silent Access Token Refresh
-        const refreshResponse = await axios.post(
-          `${API_BASE_URL}/admin/auth/refresh`,
-          {},
-          { withCredentials: true }
-        );
-
-        const newAccessToken = refreshResponse.data.accessToken;
-        setMemoryAccessToken(newAccessToken);
-        GlobalEventBus.emit(GlobalEventBus.REFRESH_SUCCESS, newAccessToken);
-        processQueue(null, newAccessToken);
-
-        // Retry Failed Request with new token
+        const newAccessToken = await performTokenRefresh();
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        // Auto Logout on Refresh Expiry
-        processQueue(refreshError, null);
-        clearMemoryAccessToken();
         GlobalEventBus.emit(GlobalEventBus.LOGOUT, refreshError);
         GlobalEventBus.emit(GlobalEventBus.UNAUTHORIZED, refreshError);
         return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
       }
     }
 
@@ -219,22 +197,9 @@ apiClient.interceptors.response.use(
 // ==========================================
 export const validateSessionOnStartup = async () => {
   try {
-    const res = await axios.post(
-      `${API_BASE_URL}/admin/auth/refresh`,
-      {},
-      {
-        withCredentials: true,
-        validateStatus: (status) => status >= 200 && status < 500,
-      }
-    );
-    if (res.status === 200 && res.data?.accessToken) {
-      setMemoryAccessToken(res.data.accessToken);
-      return { success: true, accessToken: res.data.accessToken };
-    }
-    clearMemoryAccessToken();
-    return { success: false };
+    const token = await performTokenRefresh();
+    return { success: true, accessToken: token };
   } catch (error) {
-    clearMemoryAccessToken();
     return { success: false, error };
   }
 };

@@ -6,6 +6,7 @@ import {
   generateRefreshToken,
   sendRefreshTokenCookie,
   clearRefreshTokenCookie,
+  REFRESH_SECRET,
 } from '../utils/token.utils.js';
 import { isValidEmail, isValidPassword } from '../utils/validators.js';
 import { sendOtpEmail } from '../utils/email.service.js';
@@ -53,7 +54,6 @@ export const sendAdminRegistrationOtp = async (req, res) => {
       });
     }
 
-    // Automatically detect OTP purpose from URL path (/admin => admin_registration)
     const purpose = detectOtpPurpose(req);
 
     if (!name || !email || !password) {
@@ -131,7 +131,6 @@ export const registerAdmin = async (req, res) => {
       });
     }
 
-    // Automatically detect OTP purpose from URL path (/admin => admin_registration)
     const purpose = detectOtpPurpose(req);
 
     if (!name || !email || !password || !otp) {
@@ -159,7 +158,7 @@ export const registerAdmin = async (req, res) => {
     const normalizedEmail = email.toLowerCase().trim();
     const otpString = String(otp).trim();
 
-    // Verify OTP in Database using auto-detected purpose
+    // Verify OTP in Database
     const otpRecord = await Otp.findOne({
       email: normalizedEmail,
       purpose,
@@ -174,14 +173,6 @@ export const registerAdmin = async (req, res) => {
 
     // OTP is valid! Delete it from DB
     await Otp.deleteOne({ _id: otpRecord._id });
-
-    const existingAdmin = await Admin.findOne({ email: normalizedEmail });
-    if (existingAdmin) {
-      return res.status(400).json({
-        success: false,
-        message: 'Admin with this email already exists.',
-      });
-    }
 
     const admin = new Admin({ name: name.trim(), email: normalizedEmail, password });
 
@@ -198,7 +189,7 @@ export const registerAdmin = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: 'OTP verified! Admin registered successfully.',
+      message: 'OTP verified! First-time Admin registered successfully.',
       accessToken,
       admin: {
         id: admin._id,
@@ -254,11 +245,9 @@ export const loginAdmin = async (req, res) => {
     const accessToken = generateAccessToken(admin._id);
     const refreshToken = generateRefreshToken(admin._id);
 
-    // Atomic push to refreshTokens array (prevents Mongoose VersionError)
-    await Admin.updateOne(
-      { _id: admin._id },
-      { $push: { refreshTokens: refreshToken } }
-    );
+    // Update refreshTokens array safely
+    admin.refreshTokens = [refreshToken];
+    await admin.save();
 
     // Send refresh token in HttpOnly cookie
     sendRefreshTokenCookie(res, refreshToken);
@@ -285,7 +274,7 @@ export const loginAdmin = async (req, res) => {
 };
 
 /**
- * @desc    Refresh Access Token & Rotate Refresh Token (Atomic Operation)
+ * @desc    Refresh Access Token & Rotate Refresh Token
  * @route   POST /api/admin/auth/refresh
  * @access  Public (via HttpOnly Cookie)
  */
@@ -300,38 +289,33 @@ export const refreshToken = async (req, res) => {
       });
     }
 
-    clearRefreshTokenCookie(res);
-
-    const secret = process.env.JWT_REFRESH_SECRET || 'keymaker_admin_refresh_secret_123456789';
-
     let decoded;
     try {
-      decoded = jwt.verify(incomingRefreshToken, secret);
+      decoded = jwt.verify(incomingRefreshToken, REFRESH_SECRET);
     } catch (err) {
-      return res.status(403).json({
+      clearRefreshTokenCookie(res);
+      return res.status(401).json({
         success: false,
-        message: 'Invalid or expired refresh token.',
+        message: 'Invalid or expired refresh token. Please log in again.',
       });
     }
 
-    const newAccessToken = generateAccessToken(decoded.id);
-    const newRefreshToken = generateRefreshToken(decoded.id);
-
-    // Atomic Token Rotation: Replace incomingRefreshToken with newRefreshToken in MongoDB
-    const updatedAdmin = await Admin.findOneAndUpdate(
-      { _id: decoded.id, refreshTokens: incomingRefreshToken },
-      { $set: { 'refreshTokens.$': newRefreshToken } },
-      { returnDocument: 'after' }
-    );
-
-    if (!updatedAdmin) {
-      // Incoming refresh token was reused or not found! Revoke all tokens for security
-      await Admin.updateOne({ _id: decoded.id }, { $set: { refreshTokens: [] } });
-      return res.status(403).json({
+    const admin = await Admin.findById(decoded.id);
+    if (!admin) {
+      clearRefreshTokenCookie(res);
+      return res.status(401).json({
         success: false,
-        message: 'Security alert: Refresh token reuse detected. Access revoked across all devices.',
+        message: 'Admin account not found.',
       });
     }
+
+    // Generate new Access Token and new Refresh Token
+    const newAccessToken = generateAccessToken(admin._id);
+    const newRefreshToken = generateRefreshToken(admin._id);
+
+    // Save active refresh token
+    admin.refreshTokens = [newRefreshToken];
+    await admin.save();
 
     // Set new refresh token cookie
     sendRefreshTokenCookie(res, newRefreshToken);
@@ -358,19 +342,17 @@ export const refreshToken = async (req, res) => {
  */
 export const logoutAdmin = async (req, res) => {
   try {
-    const incomingRefreshToken = req.cookies?.refreshToken;
+    const refreshTokenCookie = req.cookies?.refreshToken;
 
-    if (incomingRefreshToken) {
-      const secret = process.env.JWT_REFRESH_SECRET || 'keymaker_admin_refresh_secret_123456789';
+    if (refreshTokenCookie) {
       try {
-        const decoded = jwt.verify(incomingRefreshToken, secret);
-        // Atomic pull from refreshTokens array
+        const decoded = jwt.verify(refreshTokenCookie, REFRESH_SECRET);
         await Admin.updateOne(
           { _id: decoded.id },
-          { $pull: { refreshTokens: incomingRefreshToken } }
+          { $set: { refreshTokens: [] } }
         );
-      } catch (err) {
-        // Token already invalid
+      } catch (e) {
+        // Token was expired or invalid
       }
     }
 
@@ -382,6 +364,7 @@ export const logoutAdmin = async (req, res) => {
     });
   } catch (error) {
     console.error('Error logging out admin:', error);
+    clearRefreshTokenCookie(res);
     return res.status(500).json({
       success: false,
       message: 'Server error during logout.',

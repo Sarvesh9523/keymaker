@@ -1,11 +1,13 @@
 import jwt from 'jsonwebtoken';
 
+export const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'keymaker_admin_access_secret_123456789';
+export const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'keymaker_admin_refresh_secret_123456789';
+
 /**
  * Generate short-lived Access Token (15 minutes) for Memory storage on client side
  */
 export const generateAccessToken = (adminId) => {
-  const secret = process.env.JWT_ACCESS_SECRET || 'access_secret_key_123';
-  return jwt.sign({ id: adminId, role: 'admin' }, secret, {
+  return jwt.sign({ id: adminId, role: 'admin' }, ACCESS_SECRET, {
     expiresIn: '15m',
   });
 };
@@ -14,8 +16,7 @@ export const generateAccessToken = (adminId) => {
  * Generate long-lived Refresh Token (7 days) for HttpOnly Cookie storage
  */
 export const generateRefreshToken = (adminId) => {
-  const secret = process.env.JWT_REFRESH_SECRET || 'refresh_secret_key_456';
-  return jwt.sign({ id: adminId, role: 'admin' }, secret, {
+  return jwt.sign({ id: adminId, role: 'admin' }, REFRESH_SECRET, {
     expiresIn: '7d',
   });
 };

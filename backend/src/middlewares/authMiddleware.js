@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import Admin from '../models/admin.model.js';
+import { ACCESS_SECRET } from '../utils/token.utils.js';
 
 /**
  * Admin Authentication Middleware
@@ -23,8 +23,7 @@ export const authenticateAdmin = async (req, res, next) => {
       });
     }
 
-    const secret = process.env.JWT_ACCESS_SECRET || 'access_secret_key_123';
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, ACCESS_SECRET);
 
     // Verify token belongs to an admin role
     if (decoded.role !== 'admin') {
