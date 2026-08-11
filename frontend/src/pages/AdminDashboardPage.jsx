@@ -101,23 +101,23 @@ const AdminDashboardPage = () => {
     switch (status) {
       case 'pending':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-900 border border-yellow-300">
-            <Clock className="w-3 h-3 text-yellow-700" />
-            Pending
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold bg-yellow-100 text-yellow-900 border border-yellow-300 whitespace-nowrap shrink-0">
+            <Clock className="w-3 h-3 text-yellow-700 shrink-0" />
+            <span>Pending</span>
           </span>
         );
       case 'in-progress':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-900 border border-blue-300">
-            <RefreshCw className="w-3 h-3 text-blue-700 animate-spin-slow" />
-            In-Progress
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold bg-blue-100 text-blue-900 border border-blue-300 whitespace-nowrap shrink-0">
+            <RefreshCw className="w-3 h-3 text-blue-700 animate-spin-slow shrink-0" />
+            <span>In-Progress</span>
           </span>
         );
       case 'resolved':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-600 text-white shadow-sm">
-            <CheckCircle className="w-3 h-3 text-yellow-300" />
-            Resolved
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold bg-blue-600 text-white shadow-sm whitespace-nowrap shrink-0">
+            <CheckCircle className="w-3 h-3 text-yellow-300 shrink-0" />
+            <span>Resolved</span>
           </span>
         );
       default:
@@ -239,7 +239,7 @@ const AdminDashboardPage = () => {
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <button
             onClick={() => setStatusFilter('')}
-            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
+            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${
               statusFilter === ''
                 ? 'bg-blue-600 text-white shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -249,7 +249,7 @@ const AdminDashboardPage = () => {
           </button>
           <button
             onClick={() => setStatusFilter('pending')}
-            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
+            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${
               statusFilter === 'pending'
                 ? 'bg-yellow-400 text-yellow-950 shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -259,7 +259,7 @@ const AdminDashboardPage = () => {
           </button>
           <button
             onClick={() => setStatusFilter('in-progress')}
-            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
+            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${
               statusFilter === 'in-progress'
                 ? 'bg-blue-600 text-white shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -269,7 +269,7 @@ const AdminDashboardPage = () => {
           </button>
           <button
             onClick={() => setStatusFilter('resolved')}
-            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
+            className={`px-2 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${
               statusFilter === 'resolved'
                 ? 'bg-blue-800 text-white shadow-md'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -389,108 +389,127 @@ const AdminDashboardPage = () => {
 
       {/* Query Detail Modal */}
       {selectedQuery && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-xl rounded-3xl p-6 sm:p-8 shadow-2xl border border-blue-100 relative animate-fadeIn">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn">
+          <div className="bg-white w-full max-w-lg rounded-3xl p-4 sm:p-7 shadow-2xl border-2 border-yellow-400/80 relative my-auto max-h-[92vh] flex flex-col justify-between overflow-hidden">
+            
+            {/* Close Button */}
             <button
               onClick={() => setSelectedQuery(null)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors"
+              className="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 p-2 text-slate-400 hover:text-slate-700 rounded-xl bg-slate-100 hover:bg-slate-200 transition-all z-10"
+              title="Close modal"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
-                <Inbox className="w-5 h-5" />
+            {/* Scrollable Modal Body */}
+            <div className="overflow-y-auto pr-1 space-y-4 sm:space-y-5 text-left custom-scrollbar">
+              
+              {/* Header Info */}
+              <div className="flex items-center gap-3 pr-8">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-yellow-400 flex items-center justify-center text-blue-950 shadow-md shadow-yellow-400/30 shrink-0">
+                  <Key className="w-5 h-5 sm:w-6 sm:h-6 -rotate-45" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-base sm:text-lg font-black text-blue-950 leading-tight">Query Ticket Details</h3>
+                  <p className="text-[11px] font-bold text-slate-500 truncate mt-0.5">
+                    Ticket ID: <span className="text-blue-700 font-mono">{selectedQuery._id}</span>
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-extrabold text-blue-950">Client Query Details</h3>
-                <p className="text-xs text-slate-500 font-medium">Query ID: {selectedQuery._id}</p>
-              </div>
-            </div>
 
-            <div className="space-y-6">
-              {/* Status & Date */}
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-blue-50 border border-blue-100">
+              {/* Status & Timestamp Header Banner */}
+              <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-blue-50/80 border border-blue-100">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-600 font-bold">Status:</span>
+                  <span className="text-[11px] font-extrabold text-blue-950 uppercase tracking-wider">Status:</span>
                   {getStatusBadge(selectedQuery.status)}
                 </div>
-                <div className="text-xs text-slate-600 font-semibold flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-blue-600" />
-                  <span>{new Date(selectedQuery.createdAt).toLocaleString()}</span>
+                <div className="text-[11px] text-slate-600 font-bold flex items-center gap-1.5 whitespace-nowrap">
+                  <Calendar className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <span>{new Date(selectedQuery.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</span>
                 </div>
               </div>
 
-              {/* Client Info Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                  <span className="text-slate-500 font-bold block uppercase tracking-wider text-[10px]">Client Name</span>
-                  <span className="text-slate-900 font-bold text-sm mt-0.5 block">{selectedQuery.name}</span>
+              {/* Client Contact Info Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Full Name</span>
+                  <span className="text-xs sm:text-sm font-black text-blue-950 block mt-0.5 truncate">{selectedQuery.name}</span>
                 </div>
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                  <span className="text-slate-500 font-bold block uppercase tracking-wider text-[10px]">Email Address</span>
-                  <span className="text-blue-700 font-bold text-sm mt-0.5 block">{selectedQuery.email}</span>
+                
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Mobile Phone</span>
+                  <a href={`tel:${selectedQuery.phone}`} className="text-xs sm:text-sm font-black text-blue-600 hover:underline block mt-0.5 truncate">
+                    {selectedQuery.phone || 'N/A'}
+                  </a>
                 </div>
-                {selectedQuery.phone && (
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 sm:col-span-2">
-                    <span className="text-slate-500 font-bold block uppercase tracking-wider text-[10px]">Phone Number</span>
-                    <span className="text-slate-900 font-semibold mt-0.5 block">{selectedQuery.phone}</span>
+
+                {selectedQuery.email && (
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 sm:col-span-2">
+                    <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Email Address</span>
+                    <span className="text-xs font-bold text-slate-800 block mt-0.5 truncate">{selectedQuery.email}</span>
                   </div>
                 )}
               </div>
 
-              {/* Subject & Message */}
-              <div>
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Subject</h4>
-                <p className="text-sm font-bold text-blue-900 p-3 rounded-2xl bg-blue-50 border border-blue-100">
-                  {selectedQuery.subject}
-                </p>
-              </div>
+              {/* Optional Subject */}
+              {selectedQuery.subject && selectedQuery.subject !== 'General Key & Lock Query' && (
+                <div>
+                  <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block mb-1">Subject</span>
+                  <p className="text-xs font-bold text-blue-900 p-2.5 rounded-xl bg-blue-50 border border-blue-100">
+                    {selectedQuery.subject}
+                  </p>
+                </div>
+              )}
 
+              {/* Query Message */}
               <div>
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Full Message</h4>
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 text-xs font-medium leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto">
+                <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block mb-1">Query Message</span>
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 text-slate-800 text-xs font-medium leading-relaxed whitespace-pre-wrap max-h-36 sm:max-h-44 overflow-y-auto">
                   {selectedQuery.message}
                 </div>
               </div>
+            </div>
 
-              {/* Quick Update Buttons */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs text-slate-600 font-bold">Update Status:</span>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleStatusUpdate(selectedQuery._id, 'pending')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-                      selectedQuery.status === 'pending'
-                        ? 'bg-yellow-400 text-yellow-950 shadow-sm'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Pending
-                  </button>
-                  <button
-                    onClick={() => handleStatusUpdate(selectedQuery._id, 'in-progress')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-                      selectedQuery.status === 'in-progress'
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    In-Progress
-                  </button>
-                  <button
-                    onClick={() => handleStatusUpdate(selectedQuery._id, 'resolved')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-                      selectedQuery.status === 'resolved'
-                        ? 'bg-blue-800 text-white shadow-sm'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Resolved
-                  </button>
-                </div>
+            {/* Fixed Footer Status Update Action Bar */}
+            <div className="pt-3 sm:pt-4 mt-3 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+              <span className="text-xs font-extrabold text-blue-950 uppercase tracking-wider text-left whitespace-nowrap">Update Status:</span>
+              <div className="grid grid-cols-3 gap-1.5 sm:flex sm:gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleStatusUpdate(selectedQuery._id, 'pending')}
+                  className={`py-2 px-2.5 sm:py-1.5 sm:px-3 rounded-xl text-[11px] font-extrabold transition-all text-center whitespace-nowrap ${
+                    selectedQuery.status === 'pending'
+                      ? 'bg-yellow-400 text-yellow-950 shadow-md ring-2 ring-yellow-400'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  Pending
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleStatusUpdate(selectedQuery._id, 'in-progress')}
+                  className={`py-2 px-2.5 sm:py-1.5 sm:px-3 rounded-xl text-[11px] font-extrabold transition-all text-center whitespace-nowrap ${
+                    selectedQuery.status === 'in-progress'
+                      ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-600'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  Progress
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleStatusUpdate(selectedQuery._id, 'resolved')}
+                  className={`py-2 px-2.5 sm:py-1.5 sm:px-3 rounded-xl text-[11px] font-extrabold transition-all text-center whitespace-nowrap ${
+                    selectedQuery.status === 'resolved'
+                      ? 'bg-blue-900 text-white shadow-md ring-2 ring-blue-900'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  Resolved
+                </button>
               </div>
             </div>
+
           </div>
         </div>
       )}
